@@ -2,35 +2,32 @@
 // EQUATION f(x) = 0;
 // X = 0,75 -> f(x) = 0,066
 // X = 0,760 -> f(x) = -0.006
-// Interval of isolation [3;10]
+// Interval of isolation [3;6]
 
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 const double EPSILON = 1e-6;
 const double left_isolation_border = 3; // x0
 const double right_isolation_border = 6; // x1
 
 unsigned int validate_input(const char* formatSpecifier, void* value, char message[]);
-void take_user_input(unsigned int* debug_mode, unsigned int* iterations_count);
+void take_user_input(int* debug_mode, unsigned long* iterations_count);
 
 double math_function(double x);
-// double analytical_first_derivative(double x);
-// double analytical_second_derivative(double x);
 
-double secant(double x0, double x1, unsigned int debug_mode, unsigned int max_iterations); // Метод хорд
+double secant(double x0, double x1, unsigned int debug_mode, unsigned long max_iterations); // Метод хорд
 double bisect(); // Метод половинного ділення
 
 int main() {
-    unsigned int max_iterations;
-    unsigned int debug_mode;
+    unsigned long max_amount_iterations = 0;
+    unsigned int debug_mode = 0;
 
-    take_user_input(&debug_mode, &math_function);
-    printf("Проміжок ізоляції: [%lf;%lf]\n", left_isolation_border, right_isolation_border);
-    printf("Point %lf %lf\n", left_isolation_border, math_function(left_isolation_border));
-    printf("Point %lf %lf\n", right_isolation_border, math_function(right_isolation_border));
-    double res = secant(left_isolation_border, right_isolation_border, debug_mode, max_iterations);
-    printf("Res = %lf\n", res);
+    take_user_input(&debug_mode, &max_amount_iterations);
+    double res = secant(left_isolation_border, right_isolation_border, debug_mode, max_amount_iterations);
+    printf("\nRes = %lf\n", res);
     double res0 = math_function(res);
     printf("Math_function(res) = %lf\n", res0);
 }
@@ -51,30 +48,60 @@ unsigned int validate_input(const char* formatSpecifier, void* value, char messa
     } while (1);
 }
 
-void take_user_input(unsigned int* debug_mode, unsigned int* iterations_count) {
-    validate_input("%u", &debug_mode, "\nБажаєте увімкнути режим відладки?\n"
+void take_user_input(int* debug_mode, unsigned long* iterations_count) {
+    do {
+        validate_input("%u", debug_mode, "\nБажаєте увімкнути режим відладки?\n"
                                       "[0] - Ні\n"
                                       "[1] - Так\n");
-    validate_input("%u", &iterations_count, "\nВведіть максимальну кількість ітерацій:");
+        printf("DEBUG = %d", *debug_mode);
+        if (*debug_mode == 0 || *debug_mode == 1) {
+            break;
+        }
+    } while (1);
+
+    validate_input("%lu", iterations_count, "\nВведіть кількість ітерацій: ");
 }
 
 double math_function(double x) {
     return pow(x, 4) - 5 * pow(x, 3) - 0.25 * pow(x, 2) + 2;
 }
 
-double secant(double x0, double x1, unsigned int debug_mode, unsigned int max_iterations) {
-    unsigned int current_iteration = 0;
+double secant(double x0, double x1, unsigned int debug_mode, unsigned long max_iterations) {
+    unsigned int current_iteration = 1;
     double xi;
+    clock_t clock_start;
 
-    while (fabs(x1 - x0) >= EPSILON && current_iteration < 100) {
+    if (!debug_mode) {
+        clock_start = clock();
+    }
+
+    while (current_iteration <= max_iterations) {
         xi = (math_function(x1) * x0 - math_function(x0) * x1) / (math_function(x1) - math_function(x0));
+
+        if (debug_mode) {
+            printf("\nІтерація: %u, Значення: %lf", current_iteration, xi);
+        }
 
         if (math_function(xi) * math_function(x0) < 0) { // Перевірка чи мають f(xi) та f(x0) різні знаки
             x1 = xi;
         } else {
             x0 = xi;
         }
+
         current_iteration++;
+    }
+
+    if (fabs(x1 - x0) <= EPSILON) {
+        printf("\nF(x) = 0 у точці %lf", xi);
+        exit(1);
+    } else {
+
+    }
+
+    if (!debug_mode) {
+        clock_t clock_stop = clock();
+        double execution_time = (double)(clock_stop - clock_start) / CLOCKS_PER_SEC;
+        printf("Часу витрачено на пошук кореня: %lf секунд.", execution_time);
     }
 
     return xi;
