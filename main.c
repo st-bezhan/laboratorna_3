@@ -1,36 +1,38 @@
-#include <math.h>
-#include <stdio.h>
-
 // FUNCTION x^4 - 5x^3 - 0,25x^2 + 2;
 // EQUATION f(x) = 0;
 // X = 0,75 -> f(x) = 0,066
 // X = 0,760 -> f(x) = -0.006
+// Interval of isolation [3;10]
 
-double intial_function(double x);
-double functions_first_derivative(double x);
-double functions_second_derivative(double x);
+#include <math.h>
+#include <stdio.h>
+
+const double EPSILON = 1e-6;
+const double left_isolation_border = 3; // x0
+const double right_isolation_border = 6; // x1
 
 unsigned int validate_input(const char* formatSpecifier, void* value, char message[]);
+void take_user_input(unsigned int* debug_mode, unsigned int* iterations_count);
 
-void define_intervals();
-void check_for_sign_change(double left_border, double right_border, unsigned long int intervals);
+double math_function(double x);
+// double analytical_first_derivative(double x);
+// double analytical_second_derivative(double x);
 
-int main(void) {
-    define_intervals();
-    return 0;
-}
+double secant(double x0, double x1, unsigned int debug_mode, unsigned int max_iterations); // Метод хорд
+double bisect(); // Метод половинного ділення
 
+int main() {
+    unsigned int max_iterations;
+    unsigned int debug_mode;
 
-double initial_function(double x)  {
-    return pow(x, 4) - 5 * pow(x, 3) - 0,25 * pow(x, 2) + 2;
-}
-
-double functions_first_derivative(double x) {
-
-}
-
-double functions_second_derivative(double x) {
-
+    take_user_input(&debug_mode, &math_function);
+    printf("Проміжок ізоляції: [%lf;%lf]\n", left_isolation_border, right_isolation_border);
+    printf("Point %lf %lf\n", left_isolation_border, math_function(left_isolation_border));
+    printf("Point %lf %lf\n", right_isolation_border, math_function(right_isolation_border));
+    double res = secant(left_isolation_border, right_isolation_border, debug_mode, max_iterations);
+    printf("Res = %lf\n", res);
+    double res0 = math_function(res);
+    printf("Math_function(res) = %lf\n", res0);
 }
 
 unsigned int validate_input(const char* formatSpecifier, void* value, char message[]) {
@@ -49,49 +51,31 @@ unsigned int validate_input(const char* formatSpecifier, void* value, char messa
     } while (1);
 }
 
-void define_intervals() {
-    double left_border = 0;
-    double right_border = 0;
-    double intervals = 0;
-    validate_input("%lf", &left_border,
-        "\nType in value for left border of interval: ");
-    do {
-        validate_input("%lf", &right_border,
-       "\nType in value for right border of interval (>Left border): ");
-    } while (right_border <= left_border);
-    while (intervals <= 0) {
-        validate_input("%lu", &intervals,
-        "\nType in amount of intervals to find sign changes in them: ");
-    }
-
-    check_for_sign_change(left_border, right_border, intervals);
+void take_user_input(unsigned int* debug_mode, unsigned int* iterations_count) {
+    validate_input("%u", &debug_mode, "\nБажаєте увімкнути режим відладки?\n"
+                                      "[0] - Ні\n"
+                                      "[1] - Так\n");
+    validate_input("%u", &iterations_count, "\nВведіть максимальну кількість ітерацій:");
 }
 
-void check_for_sign_change(double left_border, double right_border, unsigned long int intervals) {
-    double step = (right_border - left_border) / intervals;
-    double current_x = left_border;
-    double fX;
+double math_function(double x) {
+    return pow(x, 4) - 5 * pow(x, 3) - 0.25 * pow(x, 2) + 2;
+}
 
-    unsigned int change_sign_counter = -1;
-    unsigned int current_step = 0;
-    unsigned char previous_sign;
-    unsigned char current_sign; // 1 > 0; 0 < 0;;; 1 == +; 0 == -;
+double secant(double x0, double x1, unsigned int debug_mode, unsigned int max_iterations) {
+    unsigned int current_iteration = 0;
+    double xi;
 
-    while (current_step <= intervals) {
-        fX = initial_function(current_x);
-        current_x += step;
+    while (fabs(x1 - x0) >= EPSILON && current_iteration < 100) {
+        xi = (math_function(x1) * x0 - math_function(x0) * x1) / (math_function(x1) - math_function(x0));
 
-        previous_sign = current_sign;
-        current_sign = fX >= 0 ? 1 : 0;
-        printf("\nCurrent sign: %u", current_sign);
-
-        if (previous_sign != current_sign) {
-            change_sign_counter++;
-            if (change_sign_counter != 0) {
-                printf("\nSign changed");
-            }
+        if (math_function(xi) * math_function(x0) < 0) { // Перевірка чи мають f(xi) та f(x0) різні знаки
+            x1 = xi;
+        } else {
+            x0 = xi;
         }
-
-        current_step++;
+        current_iteration++;
     }
+
+    return xi;
 }
