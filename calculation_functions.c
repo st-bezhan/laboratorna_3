@@ -11,16 +11,28 @@ double math_function(double x) {
     return pow(x, 4) - 5 * pow(x, 3) - 0.25 * pow(x, 2) + 2;
 }
 
-double secant(double x0, double x1, unsigned int debug_mode, unsigned long initial_max_iterations) {
+// method 0 = secant; method 1 = bisect;
+double calculate_root(double x0, double x1, unsigned int debug_mode, unsigned long initial_max_iterations, unsigned char method) {
     clock_t function_start = clock();
     struct timespec begin, end;
     unsigned int current_iteration = 1;
     unsigned long iterations_limit = initial_max_iterations;
     double xi;
     volatile double time_elapsed = 0.0;
+
     while (fabs(x1 - x0) >= EPSILON &&
         round(math_function(x0) * 10000000) / 10000000 != 0 && // Перевірка для уникнення ситуацій
         round(math_function(x1) * 10000000) / 10000000!= -0) { // з майже нескінченним циклом
+
+        if (method == 0) {
+            clock_gettime(CLOCK_MONOTONIC, &begin); //clock() - недостатньо точний, не помічає малих значень
+            xi = (math_function(x1) * x0 - math_function(x0) * x1) / (math_function(x1) - math_function(x0)); // secant
+            clock_gettime(CLOCK_MONOTONIC, &end);
+        } else if (method == 1) {
+            clock_gettime(CLOCK_MONOTONIC, &begin);
+            xi = (x0 + x1) / 2; // bisect
+            clock_gettime(CLOCK_MONOTONIC, &end);
+        }
 
         clock_gettime(CLOCK_MONOTONIC, &begin); //clock() - недостатньо точний, не помічає малих значень
         xi = (math_function(x1) * x0 - math_function(x0) * x1) / (math_function(x1) - math_function(x0));

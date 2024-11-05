@@ -21,7 +21,13 @@ unsigned int validate_input(const char* formatSpecifier, void* value, char messa
     } while (1);
 }
 
-void take_user_input(int* debug_mode, unsigned long* iterations_count) {
+void take_user_input(unsigned char* method, int* debug_mode, unsigned long* iterations_count) {
+    do {
+        validate_input("%d", method, "\nОберіть варіант:\n"
+                                     "[0] - Метод хорд\n"
+                                     "[1] - Метод половинного ділення");
+    } while (*method != 0 && *method != 1);
+
     do {
         validate_input("%u", debug_mode, "\nБажаєте увімкнути режим відладки?\n"
                                       "[0] - Ні\n"
