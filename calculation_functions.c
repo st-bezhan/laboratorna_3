@@ -22,7 +22,7 @@ double calculate_root(double x0, double x1, unsigned int debug_mode, unsigned lo
 
     while (fabs(x1 - x0) >= EPSILON
         && round(math_function(x0) * 100000000) / 100000000 != 0
-        && round(math_function(x1) * 100000000) / 100000000 != -0) {//
+        && round(math_function(x1) * 100000000) / 100000000 != 0) {//
         // &&
         //  // Перевірка для уникнення ситуацій
         // з майже нескінченним циклом
@@ -30,15 +30,16 @@ double calculate_root(double x0, double x1, unsigned int debug_mode, unsigned lo
         if (method == 0) {
             clock_gettime(CLOCK_MONOTONIC, &begin); //clock() - недостатньо точний, не помічає малих значень
             xi = (math_function(x1) * x0 - math_function(x0) * x1) / (math_function(x1) - math_function(x0)); // secant
+            update_points(&x0, &x1, xi);
             clock_gettime(CLOCK_MONOTONIC, &end);
         } else if (method == 1) {
             clock_gettime(CLOCK_MONOTONIC, &begin);
             xi = (x0 + x1) / 2; // bisect
+            update_points(&x0, &x1, xi);
             clock_gettime(CLOCK_MONOTONIC, &end);
         }
 
         time_elapsed += (end.tv_nsec - begin.tv_nsec) / 1000000000.0 + (end.tv_sec  - begin.tv_sec);
-        update_points(&x0, &x1, xi);
 
         if (debug_mode) {
             print_debug_info(current_iteration, xi, time_elapsed);
@@ -68,7 +69,7 @@ void update_points(double *x0, double *x1, double xi) {
     }
 }
 
-unsigned int check_continue(unsigned int current_iteration, unsigned long *max_iterations, unsigned long initial_max_iterations) {
+    unsigned int check_continue(unsigned int current_iteration, unsigned long *max_iterations, unsigned long initial_max_iterations) {
     unsigned int action_selection;
     do {
         printf("\nЗдійснено задану кількість ітерацій :%u"

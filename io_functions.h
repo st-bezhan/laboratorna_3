@@ -11,7 +11,7 @@
 #include <stdlib.h>
 
 unsigned int validate_input(const char* formatSpecifier, void* value, char message[]);
-void take_user_input(unsigned char* method, int* debug_mode, unsigned long* iterations_count);
+void take_user_input(unsigned char* method, unsigned int* debug_mode, unsigned long* iterations_count);
 void print_debug_info(unsigned int iteration, double xi, double time_elapsed);
 void print_result(double xi, double time_elapsed);
 

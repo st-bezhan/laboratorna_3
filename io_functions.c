@@ -21,7 +21,7 @@ unsigned int validate_input(const char* formatSpecifier, void* value, char messa
     } while (1);
 }
 
-void take_user_input(unsigned char* method, int* debug_mode, unsigned long* iterations_count) {
+void take_user_input(unsigned char* method, unsigned int* debug_mode, unsigned long* iterations_count) {
     do {
         validate_input("%d", method, "\nОберіть варіант:\n"
                                      "[0] - Метод хорд\n"
@@ -42,7 +42,7 @@ void print_debug_info(unsigned int iteration, double xi, double time_elapsed) {
 }
 
 void print_result(double xi, double time_elapsed) {
-    printf("\nЗнайдене значення корення: %lf"
-       "\nЗначення функції в цій точці: %lf", xi, math_function(xi));
-    printf("\nВитрачено часу на знаходження кореня: %lf секунд.", time_elapsed);
+    printf("\nЗнайдене значення корення: %0.15lf"
+       "\nЗначення функції в цій точці: %0.15lf", xi, math_function(xi));
+    printf("\nВитрачено часу на знаходження кореня: %0.15lf секунд.", time_elapsed);
 }
