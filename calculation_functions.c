@@ -18,11 +18,14 @@ double calculate_root(double x0, double x1, unsigned int debug_mode, unsigned lo
     unsigned int current_iteration = 1;
     unsigned long iterations_limit = initial_max_iterations;
     double xi;
-    volatile double time_elapsed = 0.0;
+    double time_elapsed = 0.0;
 
-    while (fabs(x1 - x0) >= EPSILON &&
-        round(math_function(x0) * 10000000) / 10000000 != 0 && // Перевірка для уникнення ситуацій
-        round(math_function(x1) * 10000000) / 10000000!= -0) { // з майже нескінченним циклом
+    while (fabs(x1 - x0) >= EPSILON
+        && round(math_function(x0) * 100000000) / 100000000 != 0
+        && round(math_function(x1) * 100000000) / 100000000 != -0) {//
+        // &&
+        //  // Перевірка для уникнення ситуацій
+        // з майже нескінченним циклом
 
         if (method == 0) {
             clock_gettime(CLOCK_MONOTONIC, &begin); //clock() - недостатньо точний, не помічає малих значень
@@ -34,15 +37,11 @@ double calculate_root(double x0, double x1, unsigned int debug_mode, unsigned lo
             clock_gettime(CLOCK_MONOTONIC, &end);
         }
 
-        clock_gettime(CLOCK_MONOTONIC, &begin); //clock() - недостатньо точний, не помічає малих значень
-        xi = (math_function(x1) * x0 - math_function(x0) * x1) / (math_function(x1) - math_function(x0));
-        clock_gettime(CLOCK_MONOTONIC, &end);
-
         time_elapsed += (end.tv_nsec - begin.tv_nsec) / 1000000000.0 + (end.tv_sec  - begin.tv_sec);
         update_points(&x0, &x1, xi);
 
         if (debug_mode) {
-            print_debug_info(current_iteration, xi);
+            print_debug_info(current_iteration, xi, time_elapsed);
         }
 
         if (current_iteration == iterations_limit) {
@@ -53,10 +52,10 @@ double calculate_root(double x0, double x1, unsigned int debug_mode, unsigned lo
                 exit(0);
             }
         }
-        printf("\n%lf", time_elapsed);
+        // printf("\n%lf", time_elapsed);
         current_iteration++;
     }
-    printf("\nЧасу витрачено на всю функцію: %lf", ((double)(clock() - function_start) / CLOCKS_PER_SEC));
+    printf("\nЧасу витрачено на всю функцію: %0lf", ((double)(clock() - function_start) / CLOCKS_PER_SEC));
     print_result(xi, time_elapsed);
     return xi;
 }

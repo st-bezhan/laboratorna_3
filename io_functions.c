@@ -25,7 +25,7 @@ void take_user_input(unsigned char* method, int* debug_mode, unsigned long* iter
     do {
         validate_input("%d", method, "\nОберіть варіант:\n"
                                      "[0] - Метод хорд\n"
-                                     "[1] - Метод половинного ділення");
+                                     "[1] - Метод половинного ділення\n");
     } while (*method != 0 && *method != 1);
 
     do {
@@ -37,8 +37,8 @@ void take_user_input(unsigned char* method, int* debug_mode, unsigned long* iter
     validate_input("%lu", iterations_count, "\nВведіть кількість ітерацій: ");
 }
 
-void print_debug_info(unsigned int iteration, double xi) {
-    printf("\nІтерація: %u, Значення: %lf", iteration, xi);
+void print_debug_info(unsigned int iteration, double xi, double time_elapsed) {
+    printf("\nІтерація: %u, Значення: %lf\nВитрачено часу: %lf", iteration, xi, time_elapsed);
 }
 
 void print_result(double xi, double time_elapsed) {

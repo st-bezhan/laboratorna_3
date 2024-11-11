@@ -4,14 +4,9 @@
 // X = 0,760 -> f(x) = -0.006
 // Interval of isolation [3;6]
 
-#include <math.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include "calculation_functions.h"
 #include "io_functions.h"
-
-// const double left_isolation_border = 3; // x0
-// const double right_isolation_border = 6; // x1
 
 int main() {
     system("chcp 65001"); // Некоректне кодування виводу в консоль після переносу проекта з макбука
@@ -20,7 +15,7 @@ int main() {
     unsigned char method = 0;
 
     take_user_input(&method, &debug_mode, &max_amount_iterations);
-    calculate_root(1, 10, debug_mode, max_amount_iterations, method);
+    calculate_root(1, 100, debug_mode, max_amount_iterations, method);
 }
 
 
